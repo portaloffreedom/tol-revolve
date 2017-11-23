@@ -54,6 +54,7 @@ private:
     };
 
     boost::shared_ptr<Evaluator> evaluator_;
+    std::string algorithm;
 };
 
 } /* namespace tol */

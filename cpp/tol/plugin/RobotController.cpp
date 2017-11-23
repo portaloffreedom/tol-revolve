@@ -177,6 +177,7 @@ namespace tol
   }
 
   RobotController::RobotController()
+    : algorithm("undefined")
   {
   }
 
@@ -226,7 +227,11 @@ namespace tol
                   << std::endl;
         return;
       }
-      auto algorithm = brain->GetAttribute("algorithm")->GetAsString();
+
+      algorithm = brain->GetAttribute("algorithm")->GetAsString();
+      
+      std::cout<<"Loading brain: "<<algorithm<<std::endl;
+      
       if ("rlpower::spline" == algorithm)
       {
         brain_.reset(new tol::RLPower_Splines(
@@ -305,7 +310,7 @@ namespace tol
                 )
         ));
       }
-      else if (brain->GetAttribute("algorithm")->GetAsString() == "supg::phototaxis")
+      else if ("hyperneat::supg_phototaxis" == algorithm)
       {
         init_asyncneat(
                 robot_name,
@@ -315,7 +320,12 @@ namespace tol
 
         std::vector< std::vector< float > > coordinates;
 
-        const std::string robot_type_str = getVARenv("ROBOT_TYPE");
+        std::string modelName = this->model->GetName();//getVARenv("ROBOT_TYPE");
+        size_t start = modelName.rfind('/')+1;
+        size_t end = modelName.find('-');
+        modelName = modelName.substr(start, end-start);
+        std::cout<<"init hyperneat::supg_phototaxis; modelName = "<<modelName<<std::endl;
+        const std::string robot_type_str = modelName;
         const Helper::RobotType
                 robot_type = Helper::parseRobotType(robot_type_str);
         std::cout
@@ -679,7 +689,9 @@ namespace tol
     evaluator_->updatePosition(this->model->GetRelativePose().Ign());
     auto pose = this->model->GetRelativePose().Ign();
     evaluator_->updatePosition(pose);
-//    reinterpret_cast<SUPGBrainPhototaxis&>(*brain_).updateRobotPosition(pose);
+
+    if ("hyperneat::supg_phototaxis" == algorithm)
+      reinterpret_cast<SUPGBrainPhototaxis&>(*brain_).updateRobotPosition(pose);
   }
 
 // EVALUATOR CODE

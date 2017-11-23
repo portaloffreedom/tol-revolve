@@ -36,24 +36,27 @@ class OfflineEvolutionSupervisor(Supervisor):
             sys.stderr.write('ODE Message 3 (100)\n')
 
 
-args = parser.parse_args()
+if __name__ == "__main__":
+    args = parser.parse_args()
 
-os.environ['GAZEBO_PLUGIN_PATH'] = os.path.join(tol_path, 'build')
-os.environ['GAZEBO_MODEL_PATH'] = os.path.join(tol_path, 'res', 'models') + \
-                                  ':' + os.path.join(rv_path, 'tools', 'models')
+    gazebo_cmd = args.gazebo_cmd.split(' ')
 
-supervisor = OfflineEvolutionSupervisor(
-    manager_cmd=[sys.executable, args.manager,
-                 "--load-controller", args.load_controller,
-                 "--robot-name", args.robot_name,
-                 "--experiment-round", args.experiment_round,
-                 "--brain-conf-path", args.brain_conf_path],
-    analyzer_cmd=os.path.join(rv_path, 'tools', 'analyzer', 'run-analyzer'),
-    world_file=os.path.join(here, args.world),
-    output_directory=args.output_directory,
-    restore_directory=args.restore_directory,
-    gazebo_cmd=args.gazebo_cmd,
-    manager_args=sys.argv[1:]
-)
+    os.environ['GAZEBO_PLUGIN_PATH'] = os.path.join(tol_path, 'build')
+    os.environ['GAZEBO_MODEL_PATH'] = os.path.join(tol_path, 'res', 'models') + \
+                                    ':' + os.path.join(rv_path, 'tools', 'models')
+    supervisor = OfflineEvolutionSupervisor(
+        manager_cmd=[sys.executable, args.manager,
+                    "--load-controller", args.load_controller,
+                    "--robot-name", args.robot_name,
+                    "--experiment-round", args.experiment_round,
+                    "--brain-conf-path", args.brain_conf_path],
+        analyzer_cmd=os.path.join(rv_path, 'tools', 'analyzer', 'run-analyzer'),
+        world_file=os.path.join(here, args.world),
+        output_directory=args.output_directory,
+        restore_directory=args.restore_directory,
+        gazebo_cmd=gazebo_cmd[0],
+        gazebo_args=gazebo_cmd[1:],
+        manager_args=sys.argv[1:]
+    )
 
 supervisor.launch()
