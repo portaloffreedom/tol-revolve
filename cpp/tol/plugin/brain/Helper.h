@@ -53,6 +53,8 @@ public:
 
     static RobotType parseRobotType(const std::string &str);
 
+    static std::vector<std::vector<float>> GetCoordinatesFromRobotType(const Helper::RobotType robot_type);
+
 private:
     explicit Helper()
     {}

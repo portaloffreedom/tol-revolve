@@ -40,21 +40,29 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         createEnhancedSensorWrapper(sensors)
     )
 {
-    light_constructor_left = [this] (std::vector<float> coordinates)
-        -> boost::shared_ptr<FakeLightSensor>
+    auto generate_light_pos = [this] (std::vector<float> coordinates)
+            -> ignition::math::Vector3d
     {
         ignition::math::Vector3d offset(coordinates[0]/100, coordinates[1]/100, 0);
         ignition::math::Vector3d light_pos = this->robot_position.CoordPositionAdd(offset);
+        return light_pos;
+    };
+
+    light_constructor_left = [this, generate_light_pos] (std::vector<float> coordinates)
+        -> boost::shared_ptr<FakeLightSensor>
+    {
+        coordinates[0] += 4; //cm from the center
+        ignition::math::Vector3d light_pos = generate_light_pos(coordinates);
         // this function is not supposed to delete the light
         light_sensor_left.reset(new FakeLightSensor("sensor_left", 160, light_pos));
         return light_sensor_left;
     };
 
-    light_constructor_right = [this] (std::vector<float> coordinates)
+    light_constructor_right = [this, generate_light_pos] (std::vector<float> coordinates)
         -> boost::shared_ptr<FakeLightSensor>
     {
-        ignition::math::Vector3d offset(coordinates[0]/100, coordinates[1]/100, 0);
-        ignition::math::Vector3d light_pos = this->robot_position.CoordPositionAdd(offset);
+        coordinates[0] -= 4; //cm from the center
+        ignition::math::Vector3d light_pos = generate_light_pos(coordinates);
         // this function is not supposed to delete the light
         light_sensor_right.reset(new FakeLightSensor("sensor_right", 160, light_pos));
         return light_sensor_right;
@@ -93,4 +101,10 @@ const std::vector<revolve::brain::SensorPtr> tol::SUPGBrainPhototaxis::createEnh
     result.push_back(boost::make_shared<tol::FakeLightSensor>("sensor_2_fake_filler", 0, ignition::math::Vector3d()));
 
     return result;
+}
+
+void SUPGBrainPhototaxis::loadOfflineBrain(const std::string &filename)
+{
+    revolve::brain::SUPGBrainPhototaxis::loadOfflineBrain(filename);
+    setOffline(true);
 }

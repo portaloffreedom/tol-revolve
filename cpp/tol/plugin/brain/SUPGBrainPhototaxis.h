@@ -44,6 +44,8 @@ public:
 
     void updateRobotPosition(ignition::math::Pose3d &robot_position);
 
+    void loadOfflineBrain(const std::string &filename);
+
 private: // methods
     static const std::vector<revolve::brain::SensorPtr>
     createEnhancedSensorWrapper(const std::vector<revolve::gazebo::SensorPtr> &original);
