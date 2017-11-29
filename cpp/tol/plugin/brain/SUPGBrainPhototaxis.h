@@ -46,7 +46,7 @@ public:
 
     void loadOfflineBrain(const std::string &filename);
 
-    void setLightCoordinates(const std::vector<float> &relative_coordinates) override;
+    void setLightCoordinates(const std::vector<float> &relative_coordinates);
 
 private: // methods
     static const std::vector<revolve::brain::SensorPtr>
