@@ -108,3 +108,8 @@ void SUPGBrainPhototaxis::loadOfflineBrain(const std::string &filename)
     revolve::brain::SUPGBrainPhototaxis::loadOfflineBrain(filename);
     setOffline(true);
 }
+
+void SUPGBrainPhototaxis::setLightCoordinates(const std::vector<float> &relative_coordinates)
+{
+    SUPGBrainPhototaxis::setLightCoordinates(relative_coordinates);
+}

@@ -46,6 +46,8 @@ public:
 
     void loadOfflineBrain(const std::string &filename);
 
+    void setLightCoordinates(const std::vector<float> &relative_coordinates) override;
+
 private: // methods
     static const std::vector<revolve::brain::SensorPtr>
     createEnhancedSensorWrapper(const std::vector<revolve::gazebo::SensorPtr> &original);

@@ -377,7 +377,7 @@ namespace tol
                                           sensors_);
 
           brain->loadOfflineBrain(getVARenv("GENOME_FILE"));
-          //brain->setLightCoordinates(SUPGBrainPhototaxis::PHASE::LEFT);
+          brain->setLightCoordinates({0, 50});
 
           brain_.reset(brain);
       }
