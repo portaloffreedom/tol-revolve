@@ -46,17 +46,22 @@ public:
 
     void loadOfflineBrain(const std::string &filename);
 
-    void setLightCoordinates(const std::vector<float> &relative_coordinates);
+    void setLightCoordinates(const std::vector<float> &relative_coordinates) override;
+
+    void addLightModel(gazebo::physics::ModelPtr sphere_model);
+    gazebo::physics::ModelPtr getSphereModel() const;
 
 private: // methods
     static const std::vector<revolve::brain::SensorPtr>
     createEnhancedSensorWrapper(const std::vector<revolve::gazebo::SensorPtr> &original);
-
+    ignition::math::Vector3d generateLightPos(std::vector<float> coordinates);
 
 private:
     boost::shared_ptr<FakeLightSensor> light_sensor_left,
                                        light_sensor_right;
     ignition::math::Pose3<double> robot_position;
+    gazebo::physics::ModelPtr sphere_model;
+    std::vector<float> relative_light_coordinates;
 };
 
 }

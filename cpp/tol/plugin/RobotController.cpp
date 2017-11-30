@@ -332,16 +332,46 @@ namespace tol
                 << std::endl;
 
 
-          std::vector< std::vector< float > > coordinates = Helper::GetCoordinatesFromRobotType(robot_type);
+        std::vector< std::vector< float > > coordinates = Helper::GetCoordinatesFromRobotType(robot_type);
 
+        //brain_.reset(new SUPGBrain(evaluator_, coordinates, motors_, sensors_));
+        SUPGBrainPhototaxis *brain = new SUPGBrainPhototaxis(
+                robot_name,
+                evaluator_,
+                50,
+                coordinates,
+                motors_,
+                sensors_);
 
-//     brain_.reset(new SUPGBrain(evaluator_, coordinates, motors_, sensors_));
-        brain_.reset(new SUPGBrainPhototaxis(robot_name,
-                                             evaluator_,
-                                             50,
-                                             coordinates,
-                                             motors_,
-                                             sensors_));
+        sdf::SDF sphereSDF;
+        // spawn is underground so it won't influence the simulation if unused
+        sphereSDF.SetFromString("\
+              <sdf version ='1.5'>\
+                <model name ='sphere'>\
+                  <pose>1 0 -.5 0 0 0</pose>\
+                  <static>false</static>\
+                    <link name ='link'>\
+                      <gravity>true</gravity>\
+                      <pose>0 0 0 0 0 0</pose>\
+                      <collision name ='collision'>\
+                        <geometry>\
+                          <sphere><radius>0.01</radius></sphere>\
+                        </geometry>\
+                      </collision>\
+                    <visual name ='visual'>\
+                      <geometry>\
+                        <sphere><radius>0.01</radius></sphere>\
+                      </geometry>\
+                    </visual>\
+                  </link>\
+                </model>\
+              </sdf>");
+        // Demonstrate using a custom model name.
+        sdf::ElementPtr model = sphereSDF.Root()->GetElement("model");
+        model->GetAttribute("name")->SetFromString("unique_sphere");
+        world->InsertModelSDF(sphereSDF);
+
+        brain_.reset(brain);
 
       }
       else if ("hyperneat::supg_phototaxis::replay" == algorithm)
@@ -377,6 +407,36 @@ namespace tol
                                           sensors_);
 
           brain->loadOfflineBrain(getVARenv("GENOME_FILE"));
+          sdf::SDF sphereSDF;
+          sphereSDF.SetFromString("\
+                  <sdf version ='1.5'>\
+                    <model name ='sphere'>\
+                      <pose>1 0 .01 0 0 0</pose>\
+                      <static>false</static>\
+                        <link name ='link'>\
+                          <gravity>true</gravity>\
+                          <pose>0 0 0 0 0 0</pose>\
+                          <collision name ='collision'>\
+                            <geometry>\
+                              <sphere><radius>0.01</radius></sphere>\
+                            </geometry>\
+                          </collision>\
+                        <visual name ='visual'>\
+                          <geometry>\
+                            <sphere><radius>0.01</radius></sphere>\
+                          </geometry>\
+                        </visual>\
+                      </link>\
+                    </model>\
+                  </sdf>");
+          // Demonstrate using a custom model name.
+          sdf::ElementPtr model = sphereSDF.Root()->GetElement("model");
+          model->GetAttribute("name")->SetFromString("unique_sphere");
+          world->InsertModelSDF(sphereSDF);
+          gazebo::physics::ModelPtr sphere_model = world->GetModel("unique_sphere");
+          brain->addLightModel(sphere_model);
+
+
           brain->setLightCoordinates({0, 50});
 
           brain_.reset(brain);
@@ -405,8 +465,17 @@ namespace tol
     auto pose = this->model->GetRelativePose().Ign();
     evaluator_->updatePosition(pose);
 
-    if ("hyperneat::supg_phototaxis" == algorithm)
-      reinterpret_cast<SUPGBrainPhototaxis&>(*brain_).updateRobotPosition(pose);
+    if ("hyperneat::supg_phototaxis" == algorithm
+        || "hyperneat::supg_phototaxis::replay" == algorithm)
+    {
+        SUPGBrainPhototaxis *supg_brain = reinterpret_cast<SUPGBrainPhototaxis *>(brain_.get());
+        supg_brain->updateRobotPosition(pose);
+        if (!supg_brain->getSphereModel())
+        {
+            gazebo::physics::ModelPtr sphere_model = world->GetModel("unique_sphere");
+            supg_brain->addLightModel(sphere_model);
+        }
+    }
   }
 
 // EVALUATOR CODE

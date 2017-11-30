@@ -40,29 +40,22 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         createEnhancedSensorWrapper(sensors)
     )
 {
-    auto generate_light_pos = [this] (std::vector<float> coordinates)
-            -> ignition::math::Vector3d
-    {
-        ignition::math::Vector3d offset(coordinates[0]/100, coordinates[1]/100, 0);
-        ignition::math::Vector3d light_pos = this->robot_position.CoordPositionAdd(offset);
-        return light_pos;
-    };
 
-    light_constructor_left = [this, generate_light_pos] (std::vector<float> coordinates)
+    light_constructor_left = [this] (std::vector<float> coordinates)
         -> boost::shared_ptr<FakeLightSensor>
     {
         coordinates[0] += 4; //cm from the center
-        ignition::math::Vector3d light_pos = generate_light_pos(coordinates);
+        ignition::math::Vector3d light_pos = this->generateLightPos(coordinates);
         // this function is not supposed to delete the light
         light_sensor_left.reset(new FakeLightSensor("sensor_left", 160, light_pos));
         return light_sensor_left;
     };
 
-    light_constructor_right = [this, generate_light_pos] (std::vector<float> coordinates)
+    light_constructor_right = [this] (std::vector<float> coordinates)
         -> boost::shared_ptr<FakeLightSensor>
     {
         coordinates[0] -= 4; //cm from the center
-        ignition::math::Vector3d light_pos = generate_light_pos(coordinates);
+        ignition::math::Vector3d light_pos = this->generateLightPos(coordinates);
         // this function is not supposed to delete the light
         light_sensor_right.reset(new FakeLightSensor("sensor_right", 160, light_pos));
         return light_sensor_right;
@@ -76,6 +69,14 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
 
 SUPGBrainPhototaxis::~SUPGBrainPhototaxis()
 {}
+
+
+ignition::math::Vector3d SUPGBrainPhototaxis::generateLightPos(std::vector<float> coordinates)
+{
+    ignition::math::Vector3d offset(coordinates[0]/100, coordinates[1]/100, 0);
+    ignition::math::Vector3d light_pos = this->robot_position.CoordPositionAdd(offset);
+    return light_pos;
+}
 
 void SUPGBrainPhototaxis::update(const std::vector <revolve::gazebo::MotorPtr> &motors,
                                  const std::vector <revolve::gazebo::SensorPtr> &sensors,
@@ -111,5 +112,30 @@ void SUPGBrainPhototaxis::loadOfflineBrain(const std::string &filename)
 
 void SUPGBrainPhototaxis::setLightCoordinates(const std::vector<float> &relative_coordinates)
 {
-    SUPGBrainPhototaxis::setLightCoordinates(relative_coordinates);
+    this->relative_light_coordinates = std::vector<float>(relative_coordinates);
+    revolve::brain::SUPGBrainPhototaxis::setLightCoordinates(relative_coordinates);
+    if (sphere_model) {
+        const ignition::math::Vector3d position = this->generateLightPos(relative_coordinates);
+        const gazebo::math::Quaternion rotation;
+        const gazebo::math::Pose light_pose(position, rotation);
+        sphere_model->SetWorldPose(light_pose);
+    }
 }
+
+void SUPGBrainPhototaxis::addLightModel(gazebo::physics::ModelPtr sphere_model)
+{
+    if (!this->sphere_model && sphere_model) {
+        this->sphere_model = std::move(sphere_model);
+        const ignition::math::Vector3d position = this->generateLightPos(relative_light_coordinates);
+        const gazebo::math::Quaternion rotation;
+        const gazebo::math::Pose light_pose(position, rotation);
+        this->sphere_model->SetWorldPose(light_pose);
+    }
+}
+
+gazebo::physics::ModelPtr SUPGBrainPhototaxis::getSphereModel() const
+{
+    return this->sphere_model;
+}
+
+
