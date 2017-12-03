@@ -528,7 +528,6 @@ namespace tol
                      2) +
             std::pow(previousPosition_.Pos().Y() - currentPosition_.Pos().Y(),
                      2));
-    previousPosition_ = currentPosition_;
     return dS / 30.0; // dS / RLPower::FREQUENCY_RATE
   }
 
