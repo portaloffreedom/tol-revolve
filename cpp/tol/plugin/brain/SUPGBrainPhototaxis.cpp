@@ -28,7 +28,8 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
                                          double light_radius_distance,
                                          const std::vector <std::vector<float>> &neuron_coordinates,
                                          const std::vector <revolve::gazebo::MotorPtr> &actuators,
-                                         std::vector <revolve::gazebo::SensorPtr> &sensors)
+                                         std::vector <revolve::gazebo::SensorPtr> &sensors,
+                                         const PHASE testing_phase)
     : revolve::brain::SUPGBrainPhototaxis(
         robot_name,
         evaluator,
@@ -37,7 +38,8 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         light_radius_distance,
         neuron_coordinates,
         Helper::createWrapper(actuators),
-        createEnhancedSensorWrapper(sensors)
+        createEnhancedSensorWrapper(sensors),
+        testing_phase
     )
 {
 

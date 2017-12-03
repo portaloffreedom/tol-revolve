@@ -35,7 +35,8 @@ public:
                         double light_radius_distance,
                         const std::vector< std::vector< float > >& neuron_coordinates,
                         const std::vector< revolve::gazebo::MotorPtr >& actuators,
-                        std::vector< revolve::gazebo::SensorPtr >& sensors);
+                        std::vector< revolve::gazebo::SensorPtr >& sensors,
+                        const PHASE testing_phase);
     virtual ~SUPGBrainPhototaxis();
 
     void update(const std::vector< revolve::gazebo::MotorPtr > &motors,

@@ -334,6 +334,18 @@ namespace tol
 
         std::vector< std::vector< float > > coordinates = Helper::GetCoordinatesFromRobotType(robot_type);
 
+        revolve::brain::SUPGBrainPhototaxis::PHASE phase;
+        {
+          std::string phase_string = getVARenv("SUPG_PHASE");
+
+          if (phase_string == "CENTER") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER;
+          else if (phase_string == "LEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT;
+          else if (phase_string == "RIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::RIGHT;
+          else if (phase_string == "MORELEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORELEFT;
+          else if (phase_string == "MORERIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORERIGHT;
+          else throw std::runtime_error("PHASE to test not recognized, please set the ENV variable \"SUPG_PHASE\" accordingly");
+        }
+
         //brain_.reset(new SUPGBrain(evaluator_, coordinates, motors_, sensors_));
         SUPGBrainPhototaxis *brain = new SUPGBrainPhototaxis(
                 robot_name,
@@ -341,7 +353,9 @@ namespace tol
                 50,
                 coordinates,
                 motors_,
-                sensors_);
+                sensors_,
+                phase
+      );
 
         sdf::SDF sphereSDF;
         // spawn is underground so it won't influence the simulation if unused
@@ -396,6 +410,18 @@ namespace tol
                   << std::endl;
 
 
+          revolve::brain::SUPGBrainPhototaxis::PHASE phase;
+          {
+              std::string phase_string = getVARenv("SUPG_PHASE");
+
+              if (phase_string == "CENTER") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER;
+              else if (phase_string == "LEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT;
+              else if (phase_string == "RIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::RIGHT;
+              else if (phase_string == "MORELEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORELEFT;
+              else if (phase_string == "MORERIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORERIGHT;
+              else throw std::runtime_error("PHASE to test not recognized, please set the ENV variable \"SUPG_PHASE\" accordingly");
+          }
+
           std::vector<std::vector<float> > coordinates = Helper::GetCoordinatesFromRobotType(robot_type);
 
           SUPGBrainPhototaxis *brain =
@@ -404,7 +430,8 @@ namespace tol
                                           50,
                                           coordinates,
                                           motors_,
-                                          sensors_);
+                                          sensors_,
+                                          phase);
 
           brain->loadOfflineBrain(getVARenv("GENOME_FILE"));
           sdf::SDF sphereSDF;
@@ -450,9 +477,11 @@ namespace tol
     {
       // needed because otherwise the exception dies silently and debugging is a nightmare
       std::cerr
+              << "################################################################################\n"
               << "Exception occurred while running RobotController::LoadBrain:\n"
               << "exception: "
               << e.what()
+              << "\n################################################################################"
               << std::endl;
     }
   }
