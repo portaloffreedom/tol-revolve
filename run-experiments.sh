@@ -8,7 +8,7 @@ set -e
 PROGNAME=$(basename $0)
 
 # Default argument list
-robot_list=(gecko7)
+robot_list=(gecko7 spider9 babyA snake5)
 #robot_list=(robot_1 robot_2 robot_3 robot_4 robot_5 robot_6 robot_7 robot_8 \
 #            robot_9 robot_10 robot_11 robot_12 robot_13 robot_14 robot_15 \
 #            robot_16 robot_17 robot_18 robot_19 robot_20 robot_21 robot_22 \

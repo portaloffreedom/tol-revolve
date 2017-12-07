@@ -464,7 +464,41 @@ namespace tol
           brain->addLightModel(sphere_model);
 
 
-          brain->setLightCoordinates({0, 50});
+
+          std::vector<float> relative_coordinates;
+
+          static const double pi = std::acos(-1);
+          static const double angle_15 = pi/12;
+          static const double angle_52_5 = 7*pi/24;
+
+          const double radius = 50;
+          const float x_52_5 = (const float) (std::cos(angle_52_5) * radius);
+          const float y_52_5 = (const float) (std::sin(angle_52_5) * radius);
+          const float x_15   = (const float) (std::cos(angle_15) * radius);
+          const float y_15   = (const float) (std::sin(angle_15) * radius);
+
+          switch (phase) {
+              case revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER:
+                  relative_coordinates = {0, -static_cast<float>(radius)};
+                  break;
+              case revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT:
+                  relative_coordinates = {-x_52_5, -y_52_5};
+                  break;
+              case revolve::brain::SUPGBrainPhototaxis::PHASE::RIGHT:
+                  relative_coordinates = {x_52_5, -y_52_5};
+                  break;
+              case revolve::brain::SUPGBrainPhototaxis::PHASE::MORELEFT:
+                  relative_coordinates = {-x_15, -y_15};
+                  break;
+              case revolve::brain::SUPGBrainPhototaxis::PHASE::MORERIGHT:
+                  relative_coordinates = {x_15, -y_15};
+                  break;
+              default:
+                  std::cerr << "PLEASE USE A VALID LIGHT COORDINATE PHASE!" << std::endl;
+                  throw std::runtime_error("PLEASE USE A VALID LIGHT COORDINATE PHASE!");
+          }
+
+          brain->setLightCoordinates(relative_coordinates);
 
           brain_.reset(brain);
       }
