@@ -130,7 +130,7 @@ function main() {
                 else
                     mkdir -p ${log_dir}
 
-                    echo SUPG_PHASE=${light_orientation} \
+                    SUPG_PHASE=${light_orientation} \
                     python ./start.py \
                         --load-controller ${load_controller} \
                         --manager ${manager} \
