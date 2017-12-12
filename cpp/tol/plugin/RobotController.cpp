@@ -336,7 +336,16 @@ namespace tol
 
         revolve::brain::SUPGBrainPhototaxis::PHASE phase;
         {
-          std::string phase_string = getVARenv("SUPG_PHASE");
+          std::string phase_string;
+          if (const char *env_p = getVARenv("SUPG_PHASE"))
+          {
+            phase_string = env_p;
+          }
+          else
+          {
+            phase_string = "CENTER";
+            std::cout << "CENTER" << std::endl;
+          }
 
           if (phase_string == "CENTER") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER;
           else if (phase_string == "LEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT;
@@ -412,14 +421,23 @@ namespace tol
 
           revolve::brain::SUPGBrainPhototaxis::PHASE phase;
           {
-              std::string phase_string = getVARenv("SUPG_PHASE");
+            std::string phase_string;
+            if (const char *env_p = getVARenv("SUPG_PHASE"))
+            {
+                phase_string = env_p;
+            }
+            else
+            {
+                phase_string = "CENTER";
+                std::cout << "CENTER" << std::endl;
+            }
 
-              if (phase_string == "CENTER") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER;
-              else if (phase_string == "LEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT;
-              else if (phase_string == "RIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::RIGHT;
-              else if (phase_string == "MORELEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORELEFT;
-              else if (phase_string == "MORERIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORERIGHT;
-              else throw std::runtime_error("PHASE to test not recognized, please set the ENV variable \"SUPG_PHASE\" accordingly");
+            if (phase_string == "CENTER") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::CENTER;
+            else if (phase_string == "LEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::LEFT;
+            else if (phase_string == "RIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::RIGHT;
+            else if (phase_string == "MORELEFT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORELEFT;
+            else if (phase_string == "MORERIGHT") phase = revolve::brain::SUPGBrainPhototaxis::PHASE::MORERIGHT;
+            else throw std::runtime_error("PHASE to test not recognized, please set the ENV variable \"SUPG_PHASE\" accordingly");
           }
 
           std::vector<std::vector<float> > coordinates = Helper::GetCoordinatesFromRobotType(robot_type);
