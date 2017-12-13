@@ -353,7 +353,7 @@ std::tuple< int, int > BodyParser::setCoordinates(
       std::exit(-1);
   }
 
-  return {x, y};
+  return std::tuple<int, int>(x, y);
 }
 
 ///////////////////////////////////////////////////
