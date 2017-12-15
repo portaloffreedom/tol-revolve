@@ -26,6 +26,8 @@
 #include <revolve/gazebo/sensors/VirtualSensor.h>
 #include <brain/learner/HyperAccNEATLearner_CPGController.h>
 
+#define SUPG_SENSOR_DISTANCE 200 //cm
+
 namespace tol
 {
 
@@ -361,7 +363,7 @@ namespace tol
         SUPGBrainPhototaxis *brain = new SUPGBrainPhototaxis(
                 robot_name,
                 evaluator_,
-                50,
+                SUPG_SENSOR_DISTANCE,
                 coordinates,
                 motors_,
                 sensors_,
@@ -447,7 +449,7 @@ namespace tol
           SUPGBrainPhototaxis *brain =
                   new SUPGBrainPhototaxis(robot_name,
                                           evaluator_,
-                                          50,
+                                          SUPG_SENSOR_DISTANCE,
                                           coordinates,
                                           motors_,
                                           sensors_,
@@ -491,7 +493,7 @@ namespace tol
           static const double angle_15 = pi/12;
           static const double angle_52_5 = 7*pi/24;
 
-          const double radius = 50;
+          const double radius = SUPG_SENSOR_DISTANCE;
           const float x_52_5 = (const float) (std::cos(angle_52_5) * radius);
           const float y_52_5 = (const float) (std::sin(angle_52_5) * radius);
           const float x_15   = (const float) (std::cos(angle_15) * radius);
