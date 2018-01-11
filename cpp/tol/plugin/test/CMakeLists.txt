@@ -2,9 +2,10 @@ find_package(Boost COMPONENTS REQUIRED
         "system"
         "unit_test_framework"
         )
+find_package (Threads)
 
 add_executable(testsupgbrain test_SUPGBrain.cpp)
-target_link_libraries(testsupgbrain ${Boost_LIBRARIES})
+target_link_libraries(testsupgbrain ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_test(tol-testsupgbrain testsupgbrain)
 
 #add_executable(testfakelightsensor testfakelightsensor.cpp)

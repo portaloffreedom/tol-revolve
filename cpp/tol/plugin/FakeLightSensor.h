@@ -41,6 +41,8 @@ public:
 
     virtual std::string sensorId() const override;
 
+    virtual void replace(const revolve::brain::FakeLightSensor* const new_sensor) override;
+
     virtual void updateRobotPosition(const ignition::math::Pose3d &robot_position);
 
     /**

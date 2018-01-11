@@ -29,17 +29,17 @@ FakeLightSensor::FakeLightSensor(std::string name, float fov, ignition::math::Ve
 {
 }
 
-#include <iostream>
-
 FakeLightSensor::~FakeLightSensor()
-{
-//     std::cout << "~FakeLightSensor()" << std::endl;
-}
+{}
 
 
 double FakeLightSensor::light_distance()
 {
-    return (robot_position.Pos() - light_pos).Length();
+    auto robot_pos = robot_position.Pos();
+    auto distance = robot_pos - light_pos;
+    auto distance_length = distance.Length();
+    return distance_length;
+    //return (robot_position.Pos() - light_pos).Length();
 }
 
 double FakeLightSensor::light_angle()
@@ -55,4 +55,12 @@ std::string FakeLightSensor::sensorId() const
 void tol::FakeLightSensor::updateRobotPosition(const ignition::math::Pose3d& robot_position)
 {
     this->robot_position = ignition::math::Pose3d(robot_position);
+}
+
+void FakeLightSensor::replace(const revolve::brain::FakeLightSensor *const new_sensor)
+{
+    revolve::brain::FakeLightSensor::replace(new_sensor);
+    this->light_pos = reinterpret_cast<const FakeLightSensor *const>(new_sensor)->light_pos;
+    //this->sensor_name = new_sensor->sensor_name;
+    //this->robot_position = new_sensor->robot_position;
 }

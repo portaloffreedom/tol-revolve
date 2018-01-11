@@ -32,7 +32,7 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
                                          const PHASE testing_phase)
     : revolve::brain::SUPGBrainPhototaxis(
         robot_name,
-        evaluator,
+        std::move(evaluator),
         nullptr,
         nullptr,
         light_radius_distance,
@@ -41,6 +41,7 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         createEnhancedSensorWrapper(sensors),
         testing_phase
     )
+        , relative_light_coordinates(2, 100.0)
 {
 
     light_constructor_left = [this] (std::vector<float> coordinates)
@@ -49,7 +50,11 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         coordinates[0] += 4; //cm from the center
         ignition::math::Vector3d light_pos = this->generateLightPos(coordinates);
         // this function is not supposed to delete the light
-        light_sensor_left.reset(new FakeLightSensor("sensor_left", 160, light_pos));
+        FakeLightSensor *new_sensor = new FakeLightSensor("sensor_left", 160, light_pos);
+        if (light_sensor_left)
+            light_sensor_left->replace(new_sensor);
+        else
+            light_sensor_left.reset(new_sensor);
         return light_sensor_left;
     };
 
@@ -59,7 +64,11 @@ SUPGBrainPhototaxis::SUPGBrainPhototaxis(const std::string &robot_name,
         coordinates[0] -= 4; //cm from the center
         ignition::math::Vector3d light_pos = this->generateLightPos(coordinates);
         // this function is not supposed to delete the light
-        light_sensor_right.reset(new FakeLightSensor("sensor_right", 160, light_pos));
+        FakeLightSensor *new_sensor = new FakeLightSensor("sensor_right", 160, light_pos);
+        if (light_sensor_right)
+            light_sensor_right->replace(new_sensor);
+        else
+            light_sensor_right.reset(new_sensor);
         return light_sensor_right;
     };
 
